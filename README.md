@@ -1,181 +1,181 @@
-# Fidha - Anonymous Real-World Reconnections
+# Fidha Web App
 
-**PROPRIETARY SOFTWARE** - Copyright (c) 2024 Fidha App. All rights reserved.
+A web version of the Fidha mobile app that connects people who notice each other in real life using outfit descriptions and proximity.
 
-This software is licensed under a proprietary license. See [LICENSE](LICENSE) for details.
+## Features
 
----
+- **Welcome Screen**: Beautiful landing page with app introduction
+- **Find Someone**: Search for nearby users and describe what you saw
+- **I Was Seen**: Help others find you by describing your outfit
+- **Chat**: Real-time messaging with matched users
+- **History**: View past connections and their status
+- **Responsive Design**: Works on desktop, tablet, and mobile browsers
 
-Fidha is a React Native app that enables anonymous real-world reconnections based on visual memory using BLE scanning, Firebase backend, and push notifications.
+## Tech Stack
 
-## 🚀 Features
+- **React 18** with TypeScript
+- **React Router** for navigation
+- **Styled Components** for styling
+- **Inter Font** for typography
+- **CSS3** with custom animations
 
-- **BLE Scanning**: Anonymous device discovery
-- **Visual Memory Matching**: Outfit description matching
-- **Real-time Chat**: Secure messaging after matches
-- **Location Services**: Proximity-based connections
-- **Push Notifications**: Instant match alerts
-- **Firebase Backend**: Scalable cloud infrastructure
-
-## 📱 Tech Stack
-
-- **Frontend**: React Native + Expo
-- **Backend**: Firebase (Auth, Firestore, Functions)
-- **Navigation**: React Navigation
-- **BLE**: Expo Bluetooth
-- **Location**: Expo Location
-- **Notifications**: Expo Notifications
-- **Language**: TypeScript
-
-## 🛠️ Development Setup
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- Expo CLI
-- EAS CLI
-- Firebase Project
+
+- Node.js (v16 or higher)
+- npm or yarn
 
 ### Installation
+
+1. Clone the repository:
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd fidha
+git clone https://github.com/yashmaripeddi/fidha-web.git
+cd fidha-web
+```
 
-# Install dependencies
+2. Install dependencies:
+```bash
 npm install
+```
 
-# Start development server
+3. Start the development server:
+```bash
 npm start
 ```
 
-### Environment Setup
-1. Copy `env.example` to `.env`
-2. Fill in your Firebase configuration
-3. Update `app.json` with your bundle identifiers
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-## 🏗️ Production Build
+### Available Scripts
 
-### 1. Configure EAS
-```bash
-# Login to Expo
-eas login
+- `npm start` - Runs the app in development mode
+- `npm run build` - Builds the app for production
+- `npm test` - Launches the test runner
+- `npm run eject` - Ejects from Create React App (one-way operation)
 
-# Configure EAS Build
-eas build:configure
+## Project Structure
+
+```
+src/
+├── components/
+│   └── styled.ts          # Styled components
+├── constants/
+│   └── theme.ts           # Theme constants
+├── screens/
+│   ├── WelcomeScreen.tsx
+│   ├── HomeScreen.tsx
+│   ├── FindSomeoneScreen.tsx
+│   ├── IWasSeenScreen.tsx
+│   ├── WhatWasSheWearingScreen.tsx
+│   ├── MatchFoundScreen.tsx
+│   ├── ChatScreen.tsx
+│   └── HistoryScreen.tsx
+├── types/
+│   └── index.ts           # TypeScript interfaces
+├── App.tsx                # Main app component
+└── index.tsx              # App entry point
 ```
 
-### 2. Build for Production
+## Design System
+
+### Colors
+- **Primary**: #7B4AE2 (Vibrant purple)
+- **Primary Light**: #A084E8
+- **Text**: #FFFFFF (White)
+- **Text Secondary**: #E0C3FC
+- **Success**: #00FF9D
+- **Error**: #FF3366
+
+### Typography
+- **Font Family**: Inter
+- **Weights**: 300, 400, 500, 600, 700
+
+### Components
+- Gradient backgrounds
+- Pill-shaped buttons
+- Glass-morphism cards
+- Custom heart icon
+- Responsive grid layouts
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Install Vercel CLI:
 ```bash
-# Android APK/AAB
-npm run build:android
-
-# iOS IPA
-npm run build:ios
-
-# Preview build (internal testing)
-npm run build:preview
+npm i -g vercel
 ```
 
-### 3. Submit to Stores
+2. Deploy:
 ```bash
-# Submit to Google Play Store
-npm run submit:android
-
-# Submit to App Store
-npm run submit:ios
+vercel
 ```
 
-## 🔧 Configuration
+3. Follow the prompts to connect to your GitHub repository
 
-### Firebase Setup
-1. Create Firebase project
-2. Enable Authentication, Firestore, Functions
-3. Set up security rules
-4. Configure push notifications
+### Manual Build
 
-### App Store Setup
-1. Create App Store Connect app
-2. Configure app metadata
-3. Set up certificates and provisioning profiles
+1. Build the app:
+```bash
+npm run build
+```
 
-### Google Play Setup
-1. Create Google Play Console app
-2. Configure app signing
-3. Set up release tracks
+2. The build files will be in the `build/` directory
 
-## 📋 Pre-Launch Checklist
+3. Deploy the `build/` directory to your hosting provider
 
-### Technical
-- [ ] All TypeScript errors resolved
-- [ ] Firebase security rules configured
-- [ ] Push notifications tested
-- [ ] BLE permissions working
-- [ ] Location services tested
-- [ ] App icons and splash screens set
-- [ ] Privacy policy and terms of service
+## Environment Variables
 
-### App Store
-- [ ] App metadata complete
-- [ ] Screenshots and videos uploaded
-- [ ] Age rating configured
-- [ ] Content rights verified
-- [ ] Export compliance completed
+Create a `.env` file in the root directory:
 
-### Google Play
-- [ ] App content rating completed
-- [ ] Privacy policy URL added
-- [ ] App signing configured
-- [ ] Release notes prepared
+```env
+REACT_APP_API_URL=your_api_url_here
+REACT_APP_FIREBASE_CONFIG=your_firebase_config_here
+```
 
-## 🚀 Deployment Steps
+## Contributing
 
-1. **Final Testing**
-   ```bash
-   npm run type-check
-   npm run build:preview
-   ```
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -am 'Add feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Submit a pull request
 
-2. **Production Build**
-   ```bash
-   npm run build:android
-   npm run build:ios
-   ```
+## License
 
-3. **Store Submission**
-   ```bash
-   npm run submit:android
-   npm run submit:ios
-   ```
+This project is licensed under the MIT License.
 
-4. **Monitor Release**
-   - Track app store reviews
-   - Monitor crash reports
-   - Analyze user feedback
+## Support
 
-## 📊 Analytics & Monitoring
+For support, email support@fidha.app or create an issue in this repository.
 
-- **Firebase Analytics**: User behavior tracking
-- **Crashlytics**: Crash reporting
-- **Performance Monitoring**: App performance
-- **App Store Connect**: Store analytics
+## Current Status
 
-## 🔒 Security Considerations
+✅ **Demo Mode**: App works with simulated users for testing
+✅ **Firebase Ready**: Real-time backend integration ready
+✅ **Conversation Focus**: Reframed as conversation starter app
+✅ **Responsive Design**: Works on all devices
 
-- Firebase security rules configured
-- User data anonymized
-- BLE scanning privacy compliant
-- Location data minimized
-- Chat encryption implemented
+## Next Steps
 
-## 📞 Support
+To see real users instead of bots:
 
-For technical support or questions:
-- Email: support@fidha.app
-- Documentation: [docs.fidha.app](https://docs.fidha.app)
-- GitHub Issues: [github.com/fidha/issues](https://github.com/fidha/issues)
+1. **Set up Firebase** (5 minutes):
+   - Follow [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
+   - Create Firebase project
+   - Add your config to `.env` file
 
-## 📄 License
+2. **Share with friends**:
+   - Deploy to Vercel/Netlify
+   - Share the live URL
+   - Friends will see each other as real users
 
-This project is licensed under a proprietary license. See [LICENSE](LICENSE) for details.
+## Roadmap
 
-**For licensing inquiries, contact: legal@fidha.app** 
+- [x] Firebase integration for real-time data
+- [x] BLE scanning simulation for web
+- [ ] Push notifications
+- [ ] User authentication
+- [ ] Profile management
+- [ ] Advanced matching algorithms
+- [ ] PWA capabilities

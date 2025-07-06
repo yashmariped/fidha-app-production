@@ -42,107 +42,60 @@ export const COLORS = {
 };
 
 export const FONTS = {
-  regular: 'Inter-Regular',
-  medium: 'Inter-Medium',
-  bold: 'Inter-Bold',
-  light: 'Inter-Light',
+  regular: 'Inter, system-ui, -apple-system, sans-serif',
+  medium: 'Inter, system-ui, -apple-system, sans-serif',
+  bold: 'Inter, system-ui, -apple-system, sans-serif',
+  light: 'Inter, system-ui, -apple-system, sans-serif',
 };
 
 export const SIZES = {
-  // Global sizes
-  base: 8,
-  small: 12,
-  font: 14,
-  medium: 16,
-  large: 18,
-  extraLarge: 24,
+  // Typography
+  h1: '48px',
+  h2: '32px',
+  h3: '24px',
+  h4: '20px',
+  body1: '18px',
+  body2: '16px',
+  body3: '14px',
+  caption: '12px',
+};
 
-  // Font sizes
-  h1: 32,
-  h2: 24,
-  h3: 20,
-  h4: 18,
-  body1: 16,
-  body2: 14,
-  body3: 12,
-  caption: 10,
+export const SPACING = {
+  xs: '4px',
+  s: '8px',
+  m: '16px',
+  l: '24px',
+  xl: '32px',
+  xxl: '40px',
+  xxxl: '48px',
+};
 
-  // App dimensions
-  width: '100%',
-  height: '100%',
+export const BORDER_RADIUS = {
+  xs: '4px',
+  s: '8px',
+  m: '12px',
+  l: '16px',
+  xl: '24px',
+  round: '9999px',
 };
 
 export const SHADOWS = {
   light: {
-    shadowColor: COLORS.text,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    boxShadow: '0 2px 4px rgba(255, 255, 255, 0.1)',
   },
   medium: {
-    shadowColor: COLORS.text,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 4,
+    boxShadow: '0 4px 8px rgba(255, 255, 255, 0.15)',
   },
   dark: {
-    shadowColor: COLORS.text,
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 8,
+    boxShadow: '0 6px 12px rgba(255, 255, 255, 0.2)',
   },
   glow: {
-    shadowColor: COLORS.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 10,
+    boxShadow: '0 0 20px rgba(123, 74, 226, 0.5)',
   },
-};
-
-export const SPACING = {
-  xs: 4,
-  s: 8,
-  m: 16,
-  l: 24,
-  xl: 32,
-  xxl: 40,
-  xxxl: 48,
 };
 
 export const ANIMATION = {
-  duration: {
-    fast: 200,
-    normal: 300,
-    slow: 500,
-  },
-  easing: {
-    easeInOut: 'ease-in-out',
-    easeOut: 'ease-out',
-    easeIn: 'ease-in',
-  },
-};
-
-export const BORDER_RADIUS = {
-  xs: 4,
-  s: 8,
-  m: 12,
-  l: 16,
-  xl: 24,
-  round: 9999,
+  fast: '150ms ease-in-out',
+  normal: '300ms ease-in-out',
+  slow: '500ms ease-in-out',
 }; 
