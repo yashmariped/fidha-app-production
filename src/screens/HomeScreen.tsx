@@ -8,56 +8,71 @@ import {
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
+import { COLORS } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
+  
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Fidha</Text>
-          <Text style={styles.tagline}>
-            Connect with a glance
-          </Text>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.findButton}
-            onPress={() => navigation.navigate('FindSomeone')}
-          >
-            <Text style={styles.findButtonText}>
-              Find Someone
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Fidha</Text>
+            <Text style={styles.tagline}>
+              Connect with a glance
             </Text>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity
-            style={styles.seenButton}
-            onPress={() => navigation.navigate('IWasSeen')}
-          >
-            <Text style={styles.seenButtonText}>
-              I Was Seen
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('FindSomeone')}
+            >
+              <Text style={styles.buttonText}>Find Someone</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('IWasSeen')}
+            >
+              <Text style={styles.buttonText}>I Was Seen</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.outlineButton]}
+              onPress={() => navigation.navigate('MomentHistory')}
+            >
+              <Text style={[styles.buttonText, styles.outlineButtonText]}>History</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Discover connections through shared moments
             </Text>
-          </TouchableOpacity>
+          </View>
         </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Discover connections through shared moments
-          </Text>
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
   },
   content: {
     flex: 1,
@@ -69,14 +84,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 48,
     fontWeight: 'bold',
-    color: '#6C63FF',
+    color: COLORS.text,
     marginBottom: 8,
+    textAlign: 'center',
   },
   tagline: {
-    fontSize: 16,
-    color: '#B3B3B3',
+    fontSize: 22,
+    color: COLORS.text,
     textAlign: 'center',
   },
   buttonContainer: {
@@ -84,45 +100,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 24,
   },
-  findButton: {
-    backgroundColor: '#6C63FF',
+  button: {
+    backgroundColor: COLORS.primaryLight,
     paddingVertical: 16,
     paddingHorizontal: 32,
-    borderRadius: 30,
+    borderRadius: 40,
     alignItems: 'center',
     minHeight: 60,
     justifyContent: 'center',
+    elevation: 2,
   },
-  findButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  seenButton: {
+  outlineButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#6C63FF',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 30,
-    alignItems: 'center',
-    minHeight: 60,
-    justifyContent: 'center',
+    borderColor: COLORS.primaryLight,
   },
-  seenButtonText: {
+  buttonText: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#6C63FF',
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  outlineButtonText: {
+    color: COLORS.text,
   },
   footer: {
     marginBottom: 40,
     alignItems: 'center',
   },
   footerText: {
-    fontSize: 14,
-    color: '#B3B3B3',
+    fontSize: 16,
+    color: COLORS.text,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 24,
   },
 });
 

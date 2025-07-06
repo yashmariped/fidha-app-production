@@ -1,44 +1,44 @@
 export const COLORS = {
   // Primary colors
-  primary: '#6C63FF', // Modern purple
-  primaryLight: '#8A84FF',
-  primaryDark: '#4A42E0',
+  primary: '#7B4AE2', // Vibrant purple
+  primaryLight: '#A084E8',
+  primaryDark: '#4B2995',
   
   // Secondary colors
-  secondary: '#00F5FF', // Cyan
-  secondaryLight: '#33F7FF',
-  secondaryDark: '#00D6E0',
+  secondary: '#B388FF', // Light purple
+  secondaryLight: '#E0C3FC',
+  secondaryDark: '#7C43BD',
   
   // Accent colors
-  accent1: '#FF3366', // Neon pink
-  accent2: '#00FF9D', // Neon green
-  accent3: '#FFD700', // Gold
+  accent1: '#F3C4FB', // Soft pink
+  accent2: '#F5E6FF', // Lightest purple
+  accent3: '#FFD6EC', // Light pink
   
   // Background colors
-  background: '#0A0A0F', // Dark background
-  surface: '#1A1A24',
-  surfaceLight: '#2A2A34',
+  background: '#7B4AE2', // Main background
+  surface: '#A084E8',
+  surfaceLight: '#F5E6FF',
   
   // Text colors
   text: '#FFFFFF',
-  textSecondary: '#B3B3B3',
-  textTertiary: '#808080',
+  textSecondary: '#E0C3FC',
+  textTertiary: '#B388FF',
   
   // Status colors
   success: '#00FF9D',
   error: '#FF3366',
   warning: '#FFD700',
-  info: '#00F5FF',
+  info: '#B388FF',
   
   // UI elements
-  border: '#2A2A34',
-  divider: '#1A1A24',
-  overlay: 'rgba(0, 0, 0, 0.7)',
+  border: '#A084E8',
+  divider: '#B388FF',
+  overlay: 'rgba(123, 74, 226, 0.7)',
   
   // Gradients
-  gradientPrimary: ['#6C63FF', '#00F5FF'],
-  gradientAccent: ['#FF3366', '#FFD700'],
-  gradientDark: ['#0A0A0F', '#1A1A24'],
+  gradientPrimary: ['#7B4AE2', '#A084E8'],
+  gradientAccent: ['#F3C4FB', '#FFD6EC'],
+  gradientDark: ['#4B2995', '#7B4AE2'],
 };
 
 export const FONTS = {

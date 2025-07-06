@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from '../types';
 import { COLORS } from '../constants/theme';
 
@@ -18,40 +17,6 @@ import ChatScreen from '../screens/ChatScreen';
 import MomentHistoryScreen from '../screens/MomentHistoryScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator();
-
-const MainTabs = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarStyle: {
-          backgroundColor: COLORS.background,
-          borderTopColor: COLORS.border,
-        },
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textSecondary,
-      }}
-    >
-      <Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: 'Home',
-        }}
-      />
-      <Tab.Screen 
-        name="MomentHistory" 
-        component={MomentHistoryScreen}
-        options={{
-          title: 'History',
-          headerShown: false,
-          tabBarLabel: 'History',
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 const RootNavigator = () => {
   return (
@@ -77,7 +42,7 @@ const RootNavigator = () => {
         />
         <Stack.Screen 
           name="Home" 
-          component={MainTabs}
+          component={HomeScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen 
@@ -125,6 +90,14 @@ const RootNavigator = () => {
           component={ChatScreen}
           options={{ 
             title: 'Chat',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="MomentHistory" 
+          component={MomentHistoryScreen}
+          options={{ 
+            title: 'History',
             headerShown: false,
           }}
         />

@@ -7,11 +7,18 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build:preview": "eas build --platform all --profile preview",
     "build:android": "eas build --platform android --profile production",
     "build:ios": "eas build --platform ios --profile production",
-    "build:preview": "eas build --profile preview",
     "submit:android": "eas submit --platform android",
     "submit:ios": "eas submit --platform ios",
+    "deploy:functions": "cd functions && npm run build && firebase deploy --only functions",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "deploy:storage": "firebase deploy --only storage",
+    "deploy:hosting": "cd fidha-web && npm run build && firebase deploy --only hosting",
+    "deploy:all": "npm run deploy:rules && npm run deploy:storage && npm run deploy:functions && npm run deploy:hosting",
+    "setup:firebase": "firebase init",
+    "test:functions": "cd functions && npm test",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -35,7 +42,9 @@
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "^4.11.1"
+    "react-native-screens": "^4.11.1",
+    "react-native-svg": "^15.12.0",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

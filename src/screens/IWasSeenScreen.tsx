@@ -7,10 +7,13 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
+import { COLORS } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type IWasSeenScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'IWasSeen'>;
@@ -70,6 +73,9 @@ const IWasSeenScreen: React.FC<IWasSeenScreenProps> = ({ navigation }) => {
   const [selectedActivity, setSelectedActivity] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
+
   const handleOptionSelect = (option: OutfitOption) => {
     switch (option.category) {
       case 'clothing':
@@ -103,18 +109,36 @@ const IWasSeenScreen: React.FC<IWasSeenScreenProps> = ({ navigation }) => {
     }
   };
 
-  const handleSubmit = () => {
-    // Here you would save the description to Firebase
-    const description = {
-      clothing: selectedClothing,
-      accessories: selectedAccessories,
-      activity: selectedActivity,
-      colors: selectedColors,
-    };
-    
-    // TODO: Implement Firebase save functionality
-    // Navigate to match screen or back to home
-    navigation.navigate('Home');
+  const handleSubmit = async () => {
+    try {
+      // Import the Firebase service
+      const { submitOutfitDescription } = await import('../services/firebaseService');
+      
+      // For "I was seen" screen, we need a target user ID
+      // This would typically come from the BLE discovery or nearby users
+      // For now, we'll use a demo user ID
+      const demoTargetUserId = 'demo_user_123';
+      
+      const isMatch = await submitOutfitDescription(
+        demoTargetUserId,
+        selectedClothing,
+        selectedAccessories,
+        selectedActivity,
+        selectedColors
+      );
+      
+      if (isMatch) {
+        navigation.navigate('MatchFound', { matchId: 'match_123' });
+      } else {
+        // No match yet, show waiting screen
+        navigation.navigate('Home');
+        // You could show a toast here
+      }
+    } catch (error) {
+      console.error('Error submitting description:', error);
+      // You could show an error toast here
+      navigation.navigate('Home');
+    }
   };
 
   const renderOption = (option: OutfitOption, selectedItems: string[]) => {
@@ -153,50 +177,57 @@ const IWasSeenScreen: React.FC<IWasSeenScreenProps> = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>I Was Seen</Text>
-        <View style={{ width: 50 }} />
-      </View>
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backButton}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>I Was Seen</Text>
+          <View style={{ width: 50 }} />
+        </View>
 
-      <View style={styles.introContainer}>
-        <Text style={styles.introTitle}>
-          What were you wearing?
-        </Text>
-        <Text style={styles.introText}>
-          Help someone find you by describing your outfit
-        </Text>
-      </View>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.introContainer}>
+            <Text style={styles.introTitle}>
+              Someone noticed you!
+            </Text>
+            <Text style={styles.introText}>
+              Help them find you by describing what you're wearing and where you are.
+            </Text>
+          </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {renderSection('Clothing', clothingOptions, selectedClothing)}
-        {renderSection('Accessories', accessoryOptions, selectedAccessories)}
-        {renderSection('Activity', activityOptions, selectedActivity)}
-        {renderSection('Colors', colorOptions, selectedColors)}
-      </ScrollView>
+          {renderSection('Clothing', clothingOptions, selectedClothing)}
+          {renderSection('Accessories', accessoryOptions, selectedAccessories)}
+          {renderSection('Activity', activityOptions, selectedActivity)}
+          {renderSection('Colors', colorOptions, selectedColors)}
+        </ScrollView>
 
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.submitButtonText}>
-            Submit My Outfit
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.submitButtonText}>
+              Submit Description
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
   },
   header: {
     flexDirection: 'row',
@@ -204,34 +235,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2A34',
+    borderBottomColor: COLORS.primaryLight,
   },
   backButton: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#6C63FF',
+    fontWeight: 'bold',
+    color: COLORS.text,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.text,
   },
   introContainer: {
     padding: 24,
     alignItems: 'center',
   },
   introTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
     textAlign: 'center',
-    color: '#FFFFFF',
+    color: COLORS.text,
   },
   introText: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
-    lineHeight: 20,
-    color: '#B3B3B3',
+    lineHeight: 24,
+    color: COLORS.textSecondary,
   },
   content: {
     flex: 1,
@@ -241,50 +272,54 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#FFFFFF',
+    color: COLORS.text,
   },
   optionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 12,
   },
   option: {
     width: '30%',
     aspectRatio: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
+    borderColor: COLORS.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   optionIcon: {
     fontSize: 24,
     marginBottom: 4,
+    color: COLORS.text,
   },
   optionLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: 'bold',
     textAlign: 'center',
+    color: COLORS.text,
   },
   footer: {
     padding: 24,
     borderTopWidth: 1,
-    borderTopColor: '#2A2A34',
+    borderTopColor: COLORS.primaryLight,
   },
   submitButton: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: COLORS.primaryLight,
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 25,
+    borderRadius: 40,
     alignItems: 'center',
   },
   submitButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
   },
 });
 

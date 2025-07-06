@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { COLORS, FONTS, SIZES, SPACING } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type ChatScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Chat'>;
@@ -39,6 +40,9 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ navigation, route }) => {
     },
   ]);
   const flatListRef = useRef<FlatList>(null);
+
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
 
   useEffect(() => {
     // Initialize real-time chat functionality
@@ -104,48 +108,92 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ navigation, route }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.messagesList}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
-        />
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            placeholderTextColor={COLORS.textSecondary}
-            value={message}
-            onChangeText={setMessage}
-            multiline
-          />
-          <TouchableOpacity
-            style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
-            onPress={handleSend}
-            disabled={!message.trim()}
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        
+        {/* Header with back button */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
           >
-            <Text style={styles.sendButtonText}>Send</Text>
+            <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Chat</Text>
+          <View style={{ width: 50 }} />
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <KeyboardAvoidingView
+          style={styles.chatContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={renderMessage}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.messagesList}
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+          />
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Type a message..."
+              placeholderTextColor={COLORS.textSecondary}
+              value={message}
+              onChangeText={setMessage}
+              multiline
+            />
+            <TouchableOpacity
+              style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
+              onPress={handleSend}
+              disabled={!message.trim()}
+            >
+              <Text style={styles.sendButtonText}>Send</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.m,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.primaryLight,
+  },
+  backButton: {
+    padding: SPACING.s,
+  },
+  backButtonText: {
+    fontSize: SIZES.body1,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
+  },
+  headerTitle: {
+    fontSize: SIZES.h4,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
+  },
+  chatContainer: {
+    flex: 1,
   },
   messagesList: {
     padding: SPACING.m,
@@ -163,64 +211,67 @@ const styles = StyleSheet.create({
   messageBubble: {
     padding: SPACING.m,
     borderRadius: 20,
+    maxWidth: '100%',
   },
   senderBubble: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
     borderBottomRightRadius: 4,
   },
   receiverBubble: {
-    backgroundColor: COLORS.border,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderBottomLeftRadius: 4,
   },
   messageText: {
     fontSize: SIZES.body1,
-    fontFamily: FONTS.regular,
-    marginBottom: SPACING.xs,
+    lineHeight: 20,
   },
   senderText: {
-    color: COLORS.background,
+    color: COLORS.text,
+    fontFamily: FONTS.medium,
   },
   receiverText: {
     color: COLORS.text,
+    fontFamily: FONTS.regular,
   },
   timestamp: {
-    fontSize: SIZES.body3,
-    fontFamily: FONTS.regular,
+    fontSize: SIZES.caption,
     color: COLORS.textSecondary,
-    alignSelf: 'flex-end',
+    marginTop: SPACING.xs,
+    textAlign: 'right',
   },
   inputContainer: {
     flexDirection: 'row',
     padding: SPACING.m,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderTopColor: COLORS.primaryLight,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   input: {
     flex: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 20,
     paddingHorizontal: SPACING.m,
     paddingVertical: SPACING.s,
-    marginRight: SPACING.m,
+    marginRight: SPACING.s,
+    color: COLORS.text,
     fontSize: SIZES.body1,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
-    maxHeight: 100,
   },
   sendButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
     borderRadius: 20,
     paddingHorizontal: SPACING.m,
+    paddingVertical: SPACING.s,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: COLORS.border,
+    opacity: 0.5,
   },
   sendButtonText: {
-    color: COLORS.background,
+    color: COLORS.text,
     fontSize: SIZES.body1,
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.bold,
   },
 });
 

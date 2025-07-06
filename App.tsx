@@ -1,44 +1,114 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { RootStackParamList } from './src/types';
-
-// Import screens
-import WelcomeScreen from './src/screens/WelcomeScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen';
-import HomeScreen from './src/screens/HomeScreen';
-import FindSomeoneScreen from './src/screens/FindSomeoneScreen';
-import IWasSeenScreen from './src/screens/IWasSeenScreen';
-import WhatWasSheWearingScreen from './src/screens/WhatWasSheWearingScreen';
-import WhatIsHeWearingScreen from './src/screens/WhatIsHeWearingScreen';
-import MatchFoundScreen from './src/screens/MatchFoundScreen';
-import ChatScreen from './src/screens/ChatScreen';
-import MomentHistoryScreen from './src/screens/MomentHistoryScreen';
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+import RootNavigator from './src/navigation/RootNavigator';
+import { initializeUser, requestNotificationPermission, subscribeToMatches, subscribeToNewMessages, cleanupUser, updateUserPresence } from './src/services/firebaseService';
+import { View, Text, ActivityIndicator } from 'react-native';
+import { AppState } from 'react-native';
 
 export default function App() {
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const setupApp = async () => {
+      try {
+        console.log('Starting app initialization...');
+        
+        // Initialize user
+        const user = await initializeUser();
+        console.log('User initialized successfully');
+        
+        // Request notification permission
+        const hasPermission = await requestNotificationPermission();
+        if (hasPermission) {
+          console.log('Notification permission granted');
+          
+          // Subscribe to matches
+          subscribeToMatches((match) => {
+            console.log('New match!', match);
+            // You can navigate to chat or show a modal
+          });
+          
+          // Subscribe to new messages
+          subscribeToNewMessages((message) => {
+            console.log('New message!', message);
+            // You can show a toast or update UI
+          });
+        } else {
+          console.log('Notification permission not granted');
+        }
+        
+        setIsInitializing(false);
+      } catch (error) {
+        console.error('Error setting up app:', error);
+        setInitError(error instanceof Error ? error.message : 'Unknown error');
+        setIsInitializing(false);
+      }
+    };
+
+    setupApp();
+  }, []);
+
+  // Handle app state changes for user presence
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: string) => {
+      if (nextAppState === 'active') {
+        // App came to foreground
+        const user = await initializeUser();
+        if (user) {
+          await updateUserPresence(user.id, true);
+        }
+      } else if (nextAppState === 'background' || nextAppState === 'inactive') {
+        // App went to background
+        const user = await initializeUser();
+        if (user) {
+          await updateUserPresence(user.id, false);
+        }
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    // Cleanup function
+    return () => {
+      subscription?.remove();
+      // Clean up user when app is unmounted
+      cleanupUser();
+    };
+  }, []);
+
+  if (isInitializing) {
+    return (
+      <SafeAreaProvider>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1A1A24' }}>
+          <ActivityIndicator size="large" color="#7B4AE2" />
+          <Text style={{ color: 'white', marginTop: 16, fontSize: 16 }}>Initializing Fidha...</Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (initError) {
+    return (
+      <SafeAreaProvider>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1A1A24', padding: 20 }}>
+          <Text style={{ color: 'white', fontSize: 18, textAlign: 'center', marginBottom: 16 }}>
+            Failed to initialize app
+          </Text>
+          <Text style={{ color: '#E0C3FC', fontSize: 14, textAlign: 'center' }}>
+            {initError}
+          </Text>
+          <Text style={{ color: '#E0C3FC', fontSize: 12, textAlign: 'center', marginTop: 16 }}>
+            Please check your internet connection and try again
+          </Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="FindSomeone" component={FindSomeoneScreen} />
-          <Stack.Screen name="IWasSeen" component={IWasSeenScreen} />
-          <Stack.Screen name="WhatWasSheWearing" component={WhatWasSheWearingScreen} />
-          <Stack.Screen name="WhatIsHeWearing" component={WhatIsHeWearingScreen} />
-          <Stack.Screen name="MatchFound" component={MatchFoundScreen} />
-          <Stack.Screen name="Chat" component={ChatScreen} />
-          <Stack.Screen name="MomentHistory" component={MomentHistoryScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <RootNavigator />
     </SafeAreaProvider>
   );
 } 

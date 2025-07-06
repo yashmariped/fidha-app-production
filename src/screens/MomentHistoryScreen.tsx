@@ -14,6 +14,7 @@ import { COLORS, FONTS, SIZES, SPACING } from '../constants/theme';
 import { useMoment } from '../hooks/useMoment';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type MomentHistoryScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MomentHistory'>;
@@ -34,6 +35,9 @@ interface Moment {
 
 const MomentHistoryScreen: React.FC<MomentHistoryScreenProps> = ({ navigation }) => {
   const { moments, getMomentHistory, isLoading } = useMoment();
+
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
 
   useEffect(() => {
     getMomentHistory();
@@ -91,58 +95,90 @@ const MomentHistoryScreen: React.FC<MomentHistoryScreenProps> = ({ navigation })
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <Text style={styles.title}>
-          Moment History
-        </Text>
-        <Text style={styles.subtitle}>
-          Connections that felt real
-        </Text>
-      </View>
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        
+        {/* Header with back button */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.backButtonText}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>Moment History</Text>
+          <View style={{ width: 50 }} />
+        </View>
 
-      {isLoading ? (
-        <Text style={styles.loading}>
-          Loading moments...
-        </Text>
-      ) : moments.length === 0 ? (
-        <Text style={styles.empty}>
-          No moments yet
-        </Text>
-      ) : (
-        <FlatList
-          data={moments}
-          renderItem={renderMoment}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-        />
-      )}
-    </SafeAreaView>
+        <View style={styles.content}>
+          <Text style={styles.subtitle}>
+            Connections that felt real
+          </Text>
+
+        {isLoading ? (
+            <Text style={styles.loading}>
+            Loading moments...
+          </Text>
+        ) : moments.length === 0 ? (
+            <Text style={styles.empty}>
+            No moments yet
+          </Text>
+        ) : (
+          <FlatList
+            data={moments}
+            renderItem={renderMoment}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+          />
+        )}
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: COLORS.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: SPACING.l,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.primaryLight,
+  },
+  backButton: {
+    padding: SPACING.s,
+  },
+  backButtonText: {
+    fontSize: SIZES.body1,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
   },
   title: {
     fontSize: SIZES.h2,
     fontFamily: FONTS.bold,
-    marginBottom: SPACING.xs,
     color: COLORS.text,
+  },
+  content: {
+    flex: 1,
+    padding: 20,
   },
   subtitle: {
     fontSize: SIZES.body1,
     fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
+    marginBottom: SPACING.l,
+    textAlign: 'center',
   },
   list: {
     paddingBottom: 20,
@@ -165,11 +201,11 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 10,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
   },
   username: {
     fontSize: SIZES.body1,
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   timestamp: {
@@ -185,11 +221,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     color: COLORS.textSecondary,
+    fontSize: SIZES.body1,
+    fontFamily: FONTS.regular,
   },
   empty: {
     textAlign: 'center',
     marginTop: 20,
     color: COLORS.textSecondary,
+    fontSize: SIZES.body1,
+    fontFamily: FONTS.regular,
   },
 });
 

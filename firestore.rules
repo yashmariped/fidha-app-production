@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if user is in a match
+    function isInMatch(matchId) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/matches/$(matchId)/participants/$(request.auth.uid));
+    }
+
+    // User profiles - users can only read/write their own profile
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      allow read: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/matches/{matchId}/participants/$(request.auth.uid)) &&
+        exists(/databases/$(database)/documents/matches/{matchId}/participants/$(userId));
+    }
+
+    // Outfit descriptions - users can only read/write their own outfits
+    match /outfits/{outfitId} {
+      allow read, write: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/matches/{matchId}/participants/$(request.auth.uid)) &&
+        exists(/databases/$(database)/documents/matches/{matchId}/participants/$(resource.data.userId));
+    }
+
+    // Matches - users can only read matches they're part of
+    match /matches/{matchId} {
+      allow read: if isInMatch(matchId);
+      // Only Cloud Functions can create/update matches
+      allow write: if false;
+    }
+
+    // Match participants - users can only read participants of matches they're in
+    match /matches/{matchId}/participants/{userId} {
+      allow read: if isInMatch(matchId);
+      // Only Cloud Functions can manage participants
+      allow write: if false;
+    }
+
+    // Chat messages - users can only read/write messages in matches they're part of
+    match /matches/{matchId}/messages/{messageId} {
+      allow read: if isInMatch(matchId);
+      allow create: if isInMatch(matchId) && 
+        request.resource.data.senderId == request.auth.uid;
+      allow update, delete: if false; // Messages cannot be edited/deleted
+    }
+
+    // User locations - users can only read/write their own location
+    match /locations/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Notifications - users can only read their own notifications
+    match /notifications/{notificationId} {
+      allow read, write: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+    }
+
+    // App settings - read-only for authenticated users
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admin can modify settings
+    }
+  }
+} 

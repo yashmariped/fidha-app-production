@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,12 @@ import {
   SafeAreaView,
   StatusBar,
   Dimensions,
-  FlatList,
+  ScrollView,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { COLORS, FONTS, SIZES, SPACING } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type OnboardingScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Onboarding'>;
@@ -19,95 +20,121 @@ type OnboardingScreenProps = {
 
 const { width } = Dimensions.get('window');
 
-const onboardingSteps = [
-  {
-    id: '1',
-    title: 'Notice Someone',
-    description: 'When you feel a connection with someone in real life, open Fidha and start a Pulse.',
-  },
-  {
-    id: '2',
-    title: 'Shared Moment',
-    description: 'If they also start a Pulse nearby, you\'ll both be notified of your shared moment.',
-  },
-  {
-    id: '3',
-    title: 'Confirm Connection',
-    description: 'Answer simple questions to verify you noticed each other.',
-  },
-  {
-    id: '4',
-    title: 'Start Talking',
-    description: 'Once confirmed, you can start a gentle conversation.',
-  },
-];
-
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
 
-  const renderItem = ({ item }: { item: typeof onboardingSteps[0] }) => (
-    <View style={styles.slide}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
-    </View>
-  );
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
+
+  const slides = [
+    {
+      title: 'Welcome to Fidha',
+      description: 'Connect with people you notice in real life through shared moments.',
+    },
+    {
+      title: 'Find Someone',
+      description: 'Describe what someone is wearing and see if they noticed you too.',
+    },
+    {
+      title: 'I Was Seen',
+      description: 'Help someone find you by describing your outfit and location.',
+    },
+    {
+      title: 'Start Connecting',
+      description: 'Begin your journey of meaningful connections.',
+    },
+  ];
 
   const handleNext = () => {
-    if (currentIndex < onboardingSteps.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    if (currentSlide < slides.length - 1) {
+      const nextSlide = currentSlide + 1;
+      setCurrentSlide(nextSlide);
+      scrollViewRef.current?.scrollTo({
+        x: nextSlide * width,
+        animated: true,
+      });
     } else {
-      navigation.navigate('Home');
+      navigation.navigate('Welcome');
     }
   };
 
+  const handleSkip = () => {
+    navigation.navigate('Welcome');
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.content}>
-        <FlatList
-          data={onboardingSteps}
-          renderItem={renderItem}
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleSkip}>
+            <Text style={styles.skipButton}>Skip</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          ref={scrollViewRef}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          onMomentumScrollEnd={(e) => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / width);
-            setCurrentIndex(index);
+          onMomentumScrollEnd={(event) => {
+            const slideIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+            setCurrentSlide(slideIndex);
           }}
-        />
+        >
+          {slides.map((slide, index) => (
+            <View key={index} style={styles.slide}>
+              <Text style={styles.title}>{slide.title}</Text>
+              <Text style={styles.description}>{slide.description}</Text>
+            </View>
+          ))}
+        </ScrollView>
 
         <View style={styles.footer}>
           <View style={styles.pagination}>
-            {onboardingSteps.map((_, index) => (
+            {slides.map((_, index) => (
               <View
                 key={index}
                 style={[
                   styles.paginationDot,
-                  index === currentIndex && styles.paginationDotActive,
+                  index === currentSlide && styles.paginationDotActive,
                 ]}
               />
             ))}
           </View>
-
+          
           <TouchableOpacity style={styles.button} onPress={handleNext}>
             <Text style={styles.buttonText}>
-              {currentIndex === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
+              {currentSlide === slides.length - 1 ? 'Get Started' : 'Next'}
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  content: {
-    flex: 1,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: SPACING.l,
+  },
+  skipButton: {
+    fontSize: SIZES.body1,
+    fontFamily: FONTS.medium,
+    color: COLORS.text,
   },
   slide: {
     width,
@@ -118,14 +145,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: SIZES.h2,
     fontFamily: FONTS.bold,
-    color: COLORS.primary,
+    color: COLORS.text,
     marginBottom: SPACING.m,
     textAlign: 'center',
   },
   description: {
     fontSize: SIZES.body1,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: SPACING.m,
@@ -142,23 +169,25 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.primaryLight,
     marginHorizontal: 4,
+    opacity: 0.5,
   },
   paginationDotActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.text,
+    opacity: 1,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
     paddingVertical: SPACING.m,
     paddingHorizontal: SPACING.xl,
-    borderRadius: 30,
+    borderRadius: 40,
     alignItems: 'center',
   },
   buttonText: {
-    color: COLORS.background,
+    color: COLORS.text,
     fontSize: SIZES.body1,
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.bold,
   },
 });
 

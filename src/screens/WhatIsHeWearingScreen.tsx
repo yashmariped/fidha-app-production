@@ -7,11 +7,13 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
-import { COLORS, FONTS, SIZES, SPACING } from '../constants/theme';
+import { COLORS } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type WhatIsHeWearingScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'WhatIsHeWearing'>;
@@ -69,6 +71,9 @@ const WhatIsHeWearingScreen: React.FC<WhatIsHeWearingScreenProps> = ({ navigatio
   const [selectedActivity, setSelectedActivity] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
+
   const handleOptionSelect = (option: OutfitOption) => {
     switch (option.category) {
       case 'clothing':
@@ -102,18 +107,33 @@ const WhatIsHeWearingScreen: React.FC<WhatIsHeWearingScreenProps> = ({ navigatio
     }
   };
 
-  const handleSubmit = () => {
-    // Here you would save the description to Firebase
-    const description = {
-      clothing: selectedClothing,
-      accessories: selectedAccessories,
-      activity: selectedActivity,
-      colors: selectedColors,
-    };
+  const handleSubmit = async () => {
+    if (!targetUserId) return;
     
-    // TODO: Implement Firebase save functionality
-    // Navigate to match screen or back to home
-    navigation.navigate('Home');
+    try {
+      // Import the Firebase service
+      const { submitOutfitDescription } = await import('../services/firebaseService');
+      
+      const isMatch = await submitOutfitDescription(
+        targetUserId,
+        selectedClothing,
+        selectedAccessories,
+        selectedActivity,
+        selectedColors
+      );
+      
+      if (isMatch) {
+        navigation.navigate('MatchFound', { matchId: 'match_123' });
+      } else {
+        // No match yet, show waiting screen
+        navigation.navigate('Home');
+        // You could show a toast here
+      }
+    } catch (error) {
+      console.error('Error submitting description:', error);
+      // You could show an error toast here
+      navigation.navigate('Home');
+    }
   };
 
   const renderOption = (option: OutfitOption, selectedItems: string[]) => {
@@ -152,111 +172,123 @@ const WhatIsHeWearingScreen: React.FC<WhatIsHeWearingScreenProps> = ({ navigatio
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>What Is He Wearing?</Text>
-        <View style={{ width: 50 }} />
-      </View>
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backButton}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>What is he wearing?</Text>
+          <View style={{ width: 50 }} />
+        </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {renderSection('Clothing', clothingOptions, selectedClothing)}
-        {renderSection('Accessories', accessoryOptions, selectedAccessories)}
-        {renderSection('Activity', activityOptions, selectedActivity)}
-        {renderSection('Colors', colorOptions, selectedColors)}
-      </ScrollView>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {renderSection('Clothing', clothingOptions, selectedClothing)}
+          {renderSection('Accessories', accessoryOptions, selectedAccessories)}
+          {renderSection('Activity', activityOptions, selectedActivity)}
+          {renderSection('Colors', colorOptions, selectedColors)}
+        </ScrollView>
 
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.submitButtonText}>
-            Submit Description
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.submitButtonText}>
+              Submit Description
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: SPACING.l,
+    padding: 24,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.primaryLight,
   },
   backButton: {
-    fontSize: SIZES.body1,
-    fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.text,
   },
   title: {
-    fontSize: SIZES.h3,
-    fontFamily: FONTS.bold,
+    fontSize: 20,
+    fontWeight: 'bold',
     color: COLORS.text,
   },
   content: {
     flex: 1,
-    padding: SPACING.l,
+    padding: 24,
   },
   section: {
-    marginBottom: SPACING.xl,
+    marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: SIZES.h4,
-    fontFamily: FONTS.bold,
-    marginBottom: SPACING.m,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
     color: COLORS.text,
   },
   optionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: SPACING.s,
+    gap: 12,
   },
   option: {
     width: '30%',
     aspectRatio: 1,
-    borderRadius: 12,
-    borderWidth: 2,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: SPACING.s,
+    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   optionIcon: {
     fontSize: 24,
-    marginBottom: SPACING.xs,
+    marginBottom: 4,
+    color: COLORS.text,
   },
   optionLabel: {
-    fontSize: SIZES.body3,
-    fontFamily: FONTS.medium,
+    fontSize: 12,
+    fontWeight: 'bold',
     textAlign: 'center',
+    color: COLORS.text,
   },
   footer: {
-    padding: SPACING.l,
+    padding: 24,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.primaryLight,
   },
   submitButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.l,
-    borderRadius: 30,
+    backgroundColor: COLORS.primaryLight,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 40,
     alignItems: 'center',
   },
   submitButtonText: {
-    fontSize: SIZES.h4,
-    fontFamily: FONTS.medium,
-    color: COLORS.background,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
   },
 });
 

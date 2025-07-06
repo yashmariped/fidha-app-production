@@ -1,5 +1,4 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getFunctions, Functions } from 'firebase/functions';
@@ -36,7 +35,6 @@ const validateFirebaseConfig = () => {
 
 // Initialize Firebase
 let app: FirebaseApp;
-let auth: Auth;
 let db: Firestore;
 let storage: FirebaseStorage;
 let functions: Functions;
@@ -45,15 +43,16 @@ try {
   validateFirebaseConfig();
   app = initializeApp(firebaseConfig);
 
-  // Initialize Firebase services
-  auth = getAuth(app);
+  // Initialize Firebase services (excluding Auth for now)
   db = getFirestore(app);
   storage = getStorage(app);
   functions = getFunctions(app);
+  
+  console.log('Firebase initialized successfully (without Auth)');
 } catch (error) {
   console.error('Failed to initialize Firebase:', error);
   throw error;
 }
 
-export { auth, db, storage, functions };
+export { db, storage, functions };
 export default app; 

@@ -1,6 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useToastContext } from '../components/ToastProvider';
-import { useLoadingContext } from '../components/LoadingProvider';
 
 interface Moment {
   id: string;
@@ -26,12 +24,9 @@ export const useMoment = () => {
     isLoading: false,
   });
 
-  const { show: showToast } = useToastContext();
-  const { show: showLoading, hide: hideLoading } = useLoadingContext();
-
   const detectMoment = useCallback(async (location?: { latitude: number; longitude: number }) => {
     try {
-      showLoading();
+      setMomentState(prev => ({ ...prev, isLoading: true }));
       // TODO: Implement actual moment detection logic
       const mockMoment: Moment = {
         id: Date.now().toString(),
@@ -46,25 +41,16 @@ export const useMoment = () => {
       setMomentState((prevState: MomentState) => ({
         ...prevState,
         moments: [mockMoment, ...prevState.moments],
+        isLoading: false,
       }));
-
-      showToast({
-        message: 'Moment detected!',
-        type: 'success',
-      });
     } catch (error) {
-      showToast({
-        message: 'Failed to detect moment',
-        type: 'error',
-      });
-    } finally {
-      hideLoading();
+      setMomentState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [showLoading, hideLoading, showToast]);
+  }, []);
 
   const confirmMoment = useCallback(async (momentId: string) => {
     try {
-      showLoading();
+      setMomentState(prev => ({ ...prev, isLoading: true }));
       // TODO: Implement actual moment confirmation logic
       setMomentState((prevState: MomentState) => ({
         ...prevState,
@@ -73,25 +59,16 @@ export const useMoment = () => {
             ? { ...moment, status: 'confirmed' }
             : moment
         ),
+        isLoading: false,
       }));
-
-      showToast({
-        message: 'Moment confirmed!',
-        type: 'success',
-      });
     } catch (error) {
-      showToast({
-        message: 'Failed to confirm moment',
-        type: 'error',
-      });
-    } finally {
-      hideLoading();
+      setMomentState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [showLoading, hideLoading, showToast]);
+  }, []);
 
   const rejectMoment = useCallback(async (momentId: string) => {
     try {
-      showLoading();
+      setMomentState(prev => ({ ...prev, isLoading: true }));
       // TODO: Implement actual moment rejection logic
       setMomentState((prevState: MomentState) => ({
         ...prevState,
@@ -100,25 +77,16 @@ export const useMoment = () => {
             ? { ...moment, status: 'rejected' }
             : moment
         ),
+        isLoading: false,
       }));
-
-      showToast({
-        message: 'Moment rejected',
-        type: 'info',
-      });
     } catch (error) {
-      showToast({
-        message: 'Failed to reject moment',
-        type: 'error',
-      });
-    } finally {
-      hideLoading();
+      setMomentState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [showLoading, hideLoading, showToast]);
+  }, []);
 
   const getMomentHistory = useCallback(async () => {
     try {
-      showLoading();
+      setMomentState(prev => ({ ...prev, isLoading: true }));
       // TODO: Implement actual moment history fetching logic
       const mockMoments: Moment[] = [
         {
@@ -142,16 +110,12 @@ export const useMoment = () => {
       setMomentState((prevState: MomentState) => ({
         ...prevState,
         moments: mockMoments,
+        isLoading: false,
       }));
     } catch (error) {
-      showToast({
-        message: 'Failed to fetch moment history',
-        type: 'error',
-      });
-    } finally {
-      hideLoading();
+      setMomentState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [showLoading, hideLoading, showToast]);
+  }, []);
 
   return {
     ...momentState,

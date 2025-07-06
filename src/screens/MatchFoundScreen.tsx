@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,188 +6,111 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  Animated,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
-import { COLORS, FONTS, SIZES, SPACING } from '../constants/theme';
+import { COLORS } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type MatchFoundScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MatchFound'>;
-  route: RouteProp<RootStackParamList, 'MatchFound'>;
 };
 
-const MatchFoundScreen: React.FC<MatchFoundScreenProps> = ({ navigation, route }) => {
-  const { matchId } = route.params;
-  
-  const scaleAnim = new Animated.Value(0);
-  const opacityAnim = new Animated.Value(0);
-
-  useEffect(() => {
-    // Animate the match celebration
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        tension: 50,
-        friction: 7,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  const handleStartChat = () => {
-    // Navigate to chat with the matched user
-    navigation.navigate('Chat', { chatId: `chat_${matchId}` });
-  };
-
-  const handleGoHome = () => {
-    navigation.navigate('Home');
-  };
+const MatchFoundScreen: React.FC<MatchFoundScreenProps> = ({ navigation }) => {
+  // Gradient colors as tuple for LinearGradient
+  const gradientColors: [string, string] = [COLORS.primary, COLORS.primaryLight];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      
-      <Animated.View 
-        style={[
-          styles.content,
-          {
-            opacity: opacityAnim,
-            transform: [{ scale: scaleAnim }],
-          }
-        ]}
-      >
-        <View style={styles.celebrationContainer}>
-          <Text style={styles.celebrationEmoji}>🎉</Text>
-          <Text style={styles.matchTitle}>
-            It's a Match!
-          </Text>
-          <Text style={styles.matchSubtitle}>
-            Let's Vibe
-          </Text>
-        </View>
-
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.descriptionTitle}>
+    <LinearGradient
+      colors={gradientColors}
+      style={styles.gradientBg}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.content}>
+          <Text style={styles.title}>Match Found!</Text>
+          <Text style={styles.subtitle}>
             You both noticed each other
           </Text>
-          <Text style={styles.descriptionText}>
-            Your outfit descriptions matched perfectly. Time to start a conversation!
+          <Text style={styles.description}>
+            Start a conversation and see where it leads
           </Text>
         </View>
-
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleStartChat}
+            style={styles.button}
+            onPress={() => navigation.navigate('Chat', { chatId: 'new' })}
           >
-            <Text style={styles.primaryButtonText}>
-              Start Chat
-            </Text>
+            <Text style={styles.buttonText}>Start Chat</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleGoHome}
+            style={[styles.button, styles.outlineButton]}
+            onPress={() => navigation.navigate('Home')}
           >
-            <Text style={styles.secondaryButtonText}>
-              Back to Home
-            </Text>
+            <Text style={[styles.buttonText, styles.outlineButtonText]}>Back to Home</Text>
           </TouchableOpacity>
         </View>
-      </Animated.View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    justifyContent: 'space-between',
+    padding: 24,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: SPACING.l,
   },
-  celebrationContainer: {
-    alignItems: 'center',
-    marginBottom: SPACING.xxl,
-  },
-  celebrationEmoji: {
-    fontSize: 80,
-    marginBottom: SPACING.l,
-  },
-  matchTitle: {
-    fontSize: SIZES.h1,
-    fontFamily: FONTS.bold,
-    marginBottom: SPACING.s,
-    color: COLORS.primary,
-  },
-  matchSubtitle: {
-    fontSize: SIZES.h3,
-    fontFamily: FONTS.medium,
-    color: COLORS.textSecondary,
-  },
-  descriptionContainer: {
-    alignItems: 'center',
-    marginBottom: SPACING.xxl,
-    paddingHorizontal: SPACING.l,
-  },
-  descriptionTitle: {
-    fontSize: SIZES.h4,
-    fontFamily: FONTS.bold,
-    marginBottom: SPACING.m,
-    textAlign: 'center',
+  title: {
+    fontSize: 48,
+    fontWeight: 'bold',
     color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 16,
   },
-  descriptionText: {
-    fontSize: SIZES.body1,
-    fontFamily: FONTS.regular,
+  subtitle: {
+    fontSize: 24,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 18,
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
-    color: COLORS.textSecondary,
   },
   buttonContainer: {
-    width: '100%',
-    gap: SPACING.m,
+    gap: 16,
   },
-  primaryButton: {
-    paddingVertical: SPACING.l,
-    paddingHorizontal: SPACING.xl,
-    borderRadius: 30,
+  button: {
+    backgroundColor: COLORS.primaryLight,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 40,
     alignItems: 'center',
-    minHeight: 60,
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    elevation: 2,
   },
-  primaryButtonText: {
-    fontSize: SIZES.h4,
-    fontFamily: FONTS.medium,
-    color: COLORS.background,
-  },
-  secondaryButton: {
-    paddingVertical: SPACING.l,
-    paddingHorizontal: SPACING.xl,
-    borderRadius: 30,
-    alignItems: 'center',
-    minHeight: 60,
-    justifyContent: 'center',
+  outlineButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.primaryLight,
   },
-  secondaryButtonText: {
-    fontSize: SIZES.h4,
-    fontFamily: FONTS.medium,
-    color: COLORS.primary,
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  outlineButtonText: {
+    color: COLORS.text,
   },
 });
 
